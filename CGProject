@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>CG Semester Project</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script src="https://threejs.org/build/three.js"></script>
+		<script src = "https://unpkg.com/three@0.85.0/examples/js/controls/OrbitControls.js"></script>
+		<script>
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			const loader = new THREE.TextureLoader();
+			const renderer = new THREE.WebGLRenderer();
+			renderer.shadowMap.enabled = true;
+		    	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			const geometry = new THREE.SphereGeometry(1, 32, 16);
+			const Texture = loader.load("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSZ6FM1nqkatnU-jINHdtWquS8oorRD6lhRQ&usqp=CAU");
+			const material = new THREE.MeshStandardMaterial( { map: Texture } );
+			const cube = new THREE.Mesh( geometry, material );
+			cube.castShadow = true;
+			cube.receiveShadow = false;
+			cube.position.set(0,2.5,0);
+			cube.translateY(2);
+			scene.add( cube );
+
+			const groundTexture = loader.load("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHHWn-GtRFVM3-9Y1t7hWU7hK1fiUQwcmQpw&usqp=CAU");
+			groundTexture.wrapS = THREE.RepeatWrapping;
+			groundTexture.wrapT = THREE.RepeatWrapping;
+			groundTexture.repeat.set( 2, 2 );
+			const groundGeo = new THREE.CircleBufferGeometry( 5, 32 );
+			const groundmaterial = new THREE.MeshStandardMaterial(  { map: groundTexture } );
+			const circle = new THREE.Mesh( groundGeo, groundmaterial );
+			circle.receiveShadow = true;
+			scene.add( circle );
+			circle.rotation.x = 5;
+
+			const bTexture = loader.load("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7AZUQzae-Qs3W1XANdgLxvjQegRTpjbogWg&usqp=CAU");
+			bTexture.wrapS = THREE.RepeatWrapping;
+			bTexture.wrapT = THREE.RepeatWrapping;
+			bTexture.repeat.set( 8, 8 );
+			const bordergeometry = new THREE.TorusGeometry( 5, 0.1, 16, 50 );
+			const bordermaterial = new THREE.MeshLambertMaterial( { color:"brown",wireframe:false,map: bTexture} );
+			const torus = new THREE.Mesh( bordergeometry, bordermaterial );
+			torus.receiveShadow = true;
+			scene.add( torus );
+			torus.rotation.x = 5;
+			torus.position.set(0,0.1,0)
+
+			var camera_pivot = new THREE.Object3D()
+			var Y_AXIS = new THREE.Vector3( 0, 1, 0 );
+			scene.add( camera_pivot );
+			camera_pivot.add( camera );
+
+var plight = new THREE.PointLight(0xFFFFFF, 1, 500);
+plight.position.set(0, 10, 50);
+scene.add(plight);
+plight.shadow.mapSize.width = 512; // default
+plight.shadow.mapSize.height = 512; // default
+plight.shadow.camera.near = 0.5; // default
+plight.shadow.camera.far = 500; // default
+
+			camera.position.z = 6;
+			var clock = new THREE.Clock();
+			var time = 0;
+			var delta = 0;
+
+
+			const animate = function () {
+				requestAnimationFrame( animate );
+				delta = clock.getDelta();
+  				time += delta;
+				cube.rotation.x = time * 4;
+				cube.position.y = 1 + Math.abs(Math.sin(time * 3)) * 2;
+
+				renderer.render( scene, camera );
+			};
+
+			animate();
+			const controls = new THREE.OrbitControls( camera, renderer.domElement );   //orbit controls to move camera in orbit
+
+		</script>
+	</body>
+</html>
